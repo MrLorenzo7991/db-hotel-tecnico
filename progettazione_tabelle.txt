@@ -1,0 +1,55 @@
+CREATE TABLE [dbo].[Stanze] (
+    [numero_stanza] INT           NOT NULL,
+    [piano]         TINYINT       NOT NULL,
+    [numero_letti]  TINYINT       NOT NULL,
+    [descrizione]   VARCHAR (150) DEFAULT ('Descrizione non presente') NULL,
+    PRIMARY KEY CLUSTERED ([numero_stanza] ASC)
+);
+
+CREATE TABLE [dbo].[Prenotazioni] (
+    [Id]                INT      IDENTITY (1, 1) NOT NULL,
+    [numero_stanza]     INT      NOT NULL,
+    [id_configurazione] SMALLINT NOT NULL,
+    [costo_totale]      INT      NOT NULL,
+    [data_arrivo] DATE NOT NULL, 
+    [data_partenza] DATE NOT NULL, 
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_Prenotazioni_Stanze] FOREIGN KEY ([numero_stanza]) REFERENCES [dbo].[Stanze] ([numero_stanza]),
+    CONSTRAINT [FK_Prenotazioni_Configurazione] FOREIGN KEY ([id_configurazione]) REFERENCES [dbo].[Configurazioni] ([Id])
+);
+
+CREATE TABLE [dbo].[Pagamento] (
+    [Id]              INT         IDENTITY (1, 1) NOT NULL,
+    [id_prenotazione] INT         NOT NULL,
+    [importo_pagato]  INT         NOT NULL,
+    [status]          VARCHAR (8) NOT NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_Pagamento_Prenotazioni] FOREIGN KEY ([id_prenotazione]) REFERENCES [dbo].[Prenotazioni] ([Id])
+);
+
+CREATE TABLE [dbo].[Configurazioni] (
+    [Id]          SMALLINT      NOT NULL,
+    [titolo]      VARCHAR (50)  NOT NULL,
+    [descrizione] VARCHAR (150) DEFAULT ('Descrizione non presente') NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
+CREATE TABLE [dbo].[Ospiti] (
+    [Id]              INT          IDENTITY (1, 1) NOT NULL,
+    [nome]            VARCHAR (50) NOT NULL,
+    [cognome]         VARCHAR (50) NOT NULL,
+    [data_di_nascita] DATE         NOT NULL,
+    [tipo_documento]  VARCHAR (25) NOT NULL,
+    [numero_documeto] VARCHAR (50) NOT NULL,
+    [note]            TEXT         DEFAULT ('Nessuna nota') NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    UNIQUE NONCLUSTERED ([numero_documeto] ASC)
+);
+
+CREATE TABLE [dbo].[Prenotazioni_Ospiti]
+(
+	[id_prenotazione] INT NOT NULL, 
+    [id_ospite] INT NOT NULL, 
+    CONSTRAINT [FK_Prenotazioni_Ospiti_Prenotazioni] FOREIGN KEY ([id_prenotazione]) REFERENCES [Prenotazioni]([id]), 
+    CONSTRAINT [FK_Prenotazioni_Ospiti_Ospiti] FOREIGN KEY ([id_ospite]) REFERENCES [Ospiti]([id]) 
+)
